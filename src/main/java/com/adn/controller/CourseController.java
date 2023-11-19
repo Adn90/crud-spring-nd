@@ -3,10 +3,10 @@ package com.adn.controller;
 import com.adn.model.Course;
 import com.adn.repository.CourseRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,5 +31,21 @@ public class CourseController {
     @GetMapping()
     public List<Course> list() {
         return courseRepository.findAll();
+    }
+
+    @PostMapping // @RequestMapping(method = RequestMethod.POST) same as @PostMapping()
+    // payload coming in the body of the request - ng service
+    // @RequestBody will look for the att of the RequestBody, and try to map with course
+    public ResponseEntity<Course> create(@RequestBody Course course) {
+        return ResponseEntity.status(HttpStatus.CREATED) // return correct http code
+                .body(courseRepository.save(course));
+    }
+
+    // no mapping. Should be @PostMapping, but would crash app (2 postmaps, same url)
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public Course create2(@RequestBody Course course) {
+        // there is an annotation for ResponseEntity, but this way, you can't manipulate the header and response
+        // there is no need to manipulate response and header in this case, so the code will be more clean in this case
+        return courseRepository.save(course);
     }
 }
