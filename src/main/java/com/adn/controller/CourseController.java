@@ -2,13 +2,12 @@ package com.adn.controller;
 
 import com.adn.model.Course;
 import com.adn.repository.CourseRepository;
-import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController // java servelt (endpoint; url -- rest - get, post, etc)
 @RequestMapping("api/courses")
@@ -47,5 +46,16 @@ public class CourseController {
         // there is an annotation for ResponseEntity, but this way, you can't manipulate the header and response
         // there is no need to manipulate response and header in this case, so the code will be more clean in this case
         return courseRepository.save(course);
+    }
+
+    @GetMapping("/{id}") // uri, param part of url
+    // @PathVariable annotation to extract the templated part of the URI, represented by the variable {id}.
+    // https://www.baeldung.com/spring-pathvariable
+    // JPA demands an Optional return, for unregistered ids cases
+    // instead of java Optional<Course>, we can use ResponseEntity<Course> of Spring
+    public ResponseEntity<Course> getCourseById(@PathVariable Long id) {
+        return courseRepository.findById(id)
+                .map(data -> ResponseEntity.ok().body(data))
+                .orElse(ResponseEntity.notFound().build());
     }
 }
