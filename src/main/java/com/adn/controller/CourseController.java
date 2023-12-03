@@ -58,4 +58,17 @@ public class CourseController {
                 .map(data -> ResponseEntity.ok().body(data))
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Course> update(@PathVariable Long id, @RequestBody Course course) {
+        return courseRepository.findById(id)
+                .map(dataFound -> {
+                    dataFound.setName(course.getName());
+                    dataFound.setCategory(course.getCategory());
+                    // dataFound has id, because of that, hibernate JPA will execute an update instead of create
+                    Course updated = courseRepository.save(dataFound);
+                    return  ResponseEntity.ok().body(updated);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
 }
