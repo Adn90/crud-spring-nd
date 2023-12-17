@@ -71,4 +71,22 @@ public class CourseController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @DeleteMapping("/{id}")
+    // A Hard delete or Physical delete - remove from database literally
+    // most of the time, it's just a kind of disable, not delete data
+    // just set an att like status: Active or inactive
+    // instead of courseRepository.deleteById(id), would be dataFound.setStatus...
+
+    // need to cast the build(); returns ResponseEntity<Object>
+    // if instead of using Void, just use ResponseEntity<Object>
+    // can use also wildCard <?>
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        return courseRepository.findById(id)
+                .map(dataFound -> {
+                    courseRepository.deleteById(id);
+                    return  ResponseEntity.noContent().<Void>build(); // usually, delete operations returns nothing
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
 }
