@@ -2,13 +2,18 @@ package com.adn.controller;
 
 import com.adn.model.Course;
 import com.adn.repository.CourseRepository;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
+@Validated // validates all java bean (jakarta) and hibernate. Except the model @Validate in create. That comes from Model class
 @RestController // java servelt (endpoint; url -- rest - get, post, etc)
 @RequestMapping("api/courses")
 //@AllArgsConstructor // create a constructor with all atts
@@ -35,7 +40,11 @@ public class CourseController {
     @PostMapping // @RequestMapping(method = RequestMethod.POST) same as @PostMapping()
     // payload coming in the body of the request - ng service
     // @RequestBody will look for the att of the RequestBody, and try to map with course
-    public ResponseEntity<Course> create(@RequestBody Course course) {
+    /*
+    * @Valid when receive request, @Valid will check if the json
+    * cast to course, pass in the validations in the model class
+    * */
+    public ResponseEntity<Course> create(@RequestBody @Valid Course course) {
         return ResponseEntity.status(HttpStatus.CREATED) // return correct http code
                 .body(courseRepository.save(course));
     }
@@ -53,14 +62,15 @@ public class CourseController {
     // https://www.baeldung.com/spring-pathvariable
     // JPA demands an Optional return, for unregistered ids cases
     // instead of java Optional<Course>, we can use ResponseEntity<Course> of Spring
-    public ResponseEntity<Course> getCourseById(@PathVariable Long id) {
+    // can use the jakarta validations in controllers as well. Id not null (Long is object) and only positive
+    public ResponseEntity<Course> getCourseById(@PathVariable @NotNull @Positive Long id) {
         return courseRepository.findById(id)
                 .map(data -> ResponseEntity.ok().body(data))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Course> update(@PathVariable Long id, @RequestBody Course course) {
+    public ResponseEntity<Course> update(@PathVariable @NotNull @Positive Long id, @RequestBody @Valid Course course) {
         return courseRepository.findById(id)
                 .map(dataFound -> {
                     dataFound.setName(course.getName());
@@ -81,7 +91,7 @@ public class CourseController {
     // need to cast the build(); returns ResponseEntity<Object>
     // if instead of using Void, just use ResponseEntity<Object>
     // can use also wildCard <?>
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable @NotNull @Positive Long id) {
         return courseRepository.findById(id)
                 .map(dataFound -> {
                     courseRepository.deleteById(id);
