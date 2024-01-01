@@ -7,11 +7,17 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import org.hibernate.validator.constraints.Length;
 
 @Data // generate set, get, toString, equals, hash etc
 @Entity // jpa
 //@Table(name = "Courses") in case of legacy code, where database was created before
+// hibernate will execute this query every time delete is invoked, turning delete method in soft delete
+@SQLDelete(sql = "UPDATE Course SET status = 'Inactive' WHERE id = ?")
+// hibernate will execute in every select a where clause in the query (a filter)
+@Where(clause = "status = 'Active'")
 public class Course {
 
     @Id
@@ -32,4 +38,10 @@ public class Course {
     @Length(min = 1)
     @Column(length = 10, nullable = false)
     private  String category;
+
+    @NotNull
+    @Pattern(regexp = "Active|Inactive")
+    @Length(min = 1)
+    @Column(length = 10, nullable = false)
+    private String status = "Active";
 }

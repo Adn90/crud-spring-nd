@@ -99,4 +99,13 @@ public class CourseController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    /*
+    * soft delete
+    * Does not show register based in an attribute
+    * Two-ways implementation:
+    * delete will be an update of status, and find will only return activate status
+    * Other way is using hibernate
+    * */
+
 }
