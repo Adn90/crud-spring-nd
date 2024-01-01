@@ -2,6 +2,7 @@ package com.adn.controller;
 
 import com.adn.model.Course;
 import com.adn.repository.CourseRepository;
+import com.adn.service.CourseService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -20,41 +21,24 @@ import java.util.Optional;
 // @Component // spring controls the life cycle of the instance - @RestController is a special component
 public class CourseController {
 
-    private final CourseRepository courseRepository;
+    private final CourseService courseService;
 
     // correct way to inject dependency, via controller instead of a set or attribute
     // app will understand that is required to the instance has the repository (in this case)
     // for a set method or via attribute, is necessary to use @autowired annotation
-    public CourseController(CourseRepository courseRepository) {
-        this.courseRepository = courseRepository;
+    public CourseController(CourseService courseService) {
+        this.courseService = courseService;
     }
 
-
-
-    // @RequestMapping(method = RequestMethod.GET) same as @GetMapping()
-    @GetMapping()
-    public List<Course> list() {
-        return courseRepository.findAll();
+    @GetMapping() // @RequestMapping(method = RequestMethod.GET) same as @GetMapping()
+    public @ResponseBody List<Course> list() {
+        return courseService.list();
     }
 
-    @PostMapping // @RequestMapping(method = RequestMethod.POST) same as @PostMapping()
-    // payload coming in the body of the request - ng service
-    // @RequestBody will look for the att of the RequestBody, and try to map with course
-    /*
-    * @Valid when receive request, @Valid will check if the json
-    * cast to course, pass in the validations in the model class
-    * */
-    public ResponseEntity<Course> create(@RequestBody @Valid Course course) {
-        return ResponseEntity.status(HttpStatus.CREATED) // return correct http code
-                .body(courseRepository.save(course));
-    }
-
-    // no mapping. Should be @PostMapping, but would crash app (2 postmaps, same url)
+    @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    public Course create2(@RequestBody Course course) {
-        // there is an annotation for ResponseEntity, but this way, you can't manipulate the header and response
-        // there is no need to manipulate response and header in this case, so the code will be more clean in this case
-        return courseRepository.save(course);
+    public Course create(@RequestBody @Valid Course course) {
+        return courseService.create(course);
     }
 
     @GetMapping("/{id}") // uri, param part of url
@@ -64,21 +48,15 @@ public class CourseController {
     // instead of java Optional<Course>, we can use ResponseEntity<Course> of Spring
     // can use the jakarta validations in controllers as well. Id not null (Long is object) and only positive
     public ResponseEntity<Course> getCourseById(@PathVariable @NotNull @Positive Long id) {
-        return courseRepository.findById(id)
+        return courseService.findById(id)
                 .map(data -> ResponseEntity.ok().body(data))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Course> update(@PathVariable @NotNull @Positive Long id, @RequestBody @Valid Course course) {
-        return courseRepository.findById(id)
-                .map(dataFound -> {
-                    dataFound.setName(course.getName());
-                    dataFound.setCategory(course.getCategory());
-                    // dataFound has id, because of that, hibernate JPA will execute an update instead of create
-                    Course updated = courseRepository.save(dataFound);
-                    return  ResponseEntity.ok().body(updated);
-                })
+        return courseService.update(id, course)
+                .map(dataFound -> ResponseEntity.ok().body(dataFound))
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -92,20 +70,11 @@ public class CourseController {
     // if instead of using Void, just use ResponseEntity<Object>
     // can use also wildCard <?>
     public ResponseEntity<Void> delete(@PathVariable @NotNull @Positive Long id) {
-        return courseRepository.findById(id)
-                .map(dataFound -> {
-                    courseRepository.deleteById(id);
-                    return  ResponseEntity.noContent().<Void>build(); // usually, delete operations returns nothing
-                })
-                .orElse(ResponseEntity.notFound().build());
+        if (courseService.delete(id)) {
+            // usually, delete operations returns nothing
+            return  ResponseEntity.noContent().<Void>build();
+        }
+        return ResponseEntity.notFound().build();
     }
-
-    /*
-    * soft delete
-    * Does not show register based in an attribute
-    * Two-ways implementation:
-    * delete will be an update of status, and find will only return activate status
-    * Other way is using hibernate
-    * */
 
 }

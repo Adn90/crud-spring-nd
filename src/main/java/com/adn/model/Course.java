@@ -16,7 +16,7 @@ import org.hibernate.validator.constraints.Length;
 //@Table(name = "Courses") in case of legacy code, where database was created before
 // hibernate will execute this query every time delete is invoked, turning delete method in soft delete
 @SQLDelete(sql = "UPDATE Course SET status = 'Inactive' WHERE id = ?")
-// hibernate will execute in every select a where clause in the query (a filter)
+// hibernate will execute in every select a where clause >>in the query (a filter)
 @Where(clause = "status = 'Active'")
 public class Course {
 
