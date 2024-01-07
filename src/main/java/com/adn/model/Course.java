@@ -41,7 +41,7 @@ public class Course {
 
     @NotNull
     @Pattern(regexp = "Active|Inactive")
-    @Length(min = 1)
+    @Length(max = 10)
     @Column(length = 10, nullable = false)
     private String status = "Active";
 }
