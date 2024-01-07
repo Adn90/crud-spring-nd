@@ -1,5 +1,6 @@
 package com.adn.service;
 
+import com.adn.exception.RecordNotFoundException;
 import com.adn.model.Course;
 import com.adn.repository.CourseRepository;
 import jakarta.validation.Valid;
@@ -27,30 +28,27 @@ public class CourseService {
         return courseRepository.findAll();
     }
 
-    public Optional<Course> findById(@PathVariable @NotNull @Positive Long id) {
-        return courseRepository.findById(id);
+    public Course findById(@PathVariable @NotNull @Positive Long id) {
+        return courseRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException(id));
     }
 
     public Course create(@Valid Course course) {
         return courseRepository.save(course);
     }
 
-    public Optional<Course> update(@NotNull @Positive Long id, @Valid Course course) {
+    public Course update(@NotNull @Positive Long id, @Valid Course course) {
         return courseRepository.findById(id)
                 .map(dataFound -> {
                     dataFound.setName(course.getName());
                     dataFound.setCategory(course.getCategory());
                     // dataFound has id, because of that, hibernate JPA will execute an update instead of create
                     return courseRepository.save(dataFound);
-                });
+                }).orElseThrow(() -> new RecordNotFoundException(id));
     }
 
-    public boolean delete(@PathVariable @NotNull @Positive Long id) {
-        return courseRepository.findById(id)
-                .map(dataFound -> {
-                    courseRepository.deleteById(id);
-                    return  true;
-                })
-                .orElse(false);
+    public void delete(@PathVariable @NotNull @Positive Long id) {
+        courseRepository.delete(courseRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException(id)));
     }
 }

@@ -47,17 +47,13 @@ public class CourseController {
     // JPA demands an Optional return, for unregistered ids cases
     // instead of java Optional<Course>, we can use ResponseEntity<Course> of Spring
     // can use the jakarta validations in controllers as well. Id not null (Long is object) and only positive
-    public ResponseEntity<Course> getCourseById(@PathVariable @NotNull @Positive Long id) {
-        return courseService.findById(id)
-                .map(data -> ResponseEntity.ok().body(data))
-                .orElse(ResponseEntity.notFound().build());
+    public Course getCourseById(@PathVariable @NotNull @Positive Long id) {
+        return courseService.findById(id);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Course> update(@PathVariable @NotNull @Positive Long id, @RequestBody @Valid Course course) {
-        return courseService.update(id, course)
-                .map(dataFound -> ResponseEntity.ok().body(dataFound))
-                .orElse(ResponseEntity.notFound().build());
+    public Course update(@PathVariable @NotNull @Positive Long id, @RequestBody @Valid Course course) {
+        return courseService.update(id, course);
     }
 
     @DeleteMapping("/{id}")
@@ -65,16 +61,9 @@ public class CourseController {
     // most of the time, it's just a kind of disable, not delete data
     // just set an att like status: Active or inactive
     // instead of courseRepository.deleteById(id), would be dataFound.setStatus...
-
-    // need to cast the build(); returns ResponseEntity<Object>
-    // if instead of using Void, just use ResponseEntity<Object>
-    // can use also wildCard <?>
-    public ResponseEntity<Void> delete(@PathVariable @NotNull @Positive Long id) {
-        if (courseService.delete(id)) {
-            // usually, delete operations returns nothing
-            return  ResponseEntity.noContent().<Void>build();
-        }
-        return ResponseEntity.notFound().build();
+    @ResponseStatus(code = HttpStatus.NO_CONTENT) // keeping return no content, after exception handling
+    public void delete(@PathVariable @NotNull @Positive Long id) {
+        courseService.delete(id);
     }
 
 }
