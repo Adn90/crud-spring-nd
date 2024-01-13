@@ -74,3 +74,10 @@ cannot use JPA/hibernate (be an Entity):
 ```
 
 Must consider a Request DTO(without id) and Response DTO(with id)
+
+
+# Mapper
+
+map entity -> dto, dto -> entity
+
+https://www.baeldung.com/java-performance-mapping-frameworks

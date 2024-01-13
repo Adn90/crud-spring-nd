@@ -1,13 +1,13 @@
 package com.adn.controller;
 
+import com.adn.dto.CourseDTO;
 import com.adn.model.Course;
-import com.adn.repository.CourseRepository;
+
 import com.adn.service.CourseService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,13 +31,13 @@ public class CourseController {
     }
 
     @GetMapping() // @RequestMapping(method = RequestMethod.GET) same as @GetMapping()
-    public @ResponseBody List<Course> list() {
+    public @ResponseBody List<CourseDTO> list() {
         return courseService.list();
     }
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    public Course create(@RequestBody @Valid Course course) {
+    public CourseDTO create(@RequestBody @Valid @NotNull CourseDTO course) {
         return courseService.create(course);
     }
 
@@ -47,12 +47,12 @@ public class CourseController {
     // JPA demands an Optional return, for unregistered ids cases
     // instead of java Optional<Course>, we can use ResponseEntity<Course> of Spring
     // can use the jakarta validations in controllers as well. Id not null (Long is object) and only positive
-    public Course getCourseById(@PathVariable @NotNull @Positive Long id) {
+    public CourseDTO getCourseById(@PathVariable @NotNull @Positive Long id) {
         return courseService.findById(id);
     }
 
     @PutMapping("/{id}")
-    public Course update(@PathVariable @NotNull @Positive Long id, @RequestBody @Valid Course course) {
+    public CourseDTO update(@PathVariable @NotNull @Positive Long id, @RequestBody @Valid @NotNull CourseDTO course) {
         return courseService.update(id, course);
     }
 
