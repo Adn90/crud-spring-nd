@@ -9,7 +9,7 @@ import org.hibernate.validator.constraints.Length;
 public record CourseDTO(
         @JsonProperty("_id") Long id,
         @NotBlank @NotNull @Length(min = 5, max = 10) String name,
-        @NotNull @Length(max = 10) @Pattern(regexp = "Back-end|Front-end|Games") String category,
-        @NotNull @Pattern(regexp = "Active|Inactive")  @Length(max = 10) @Pattern(regexp = "Active|Inactive") String status
+        @NotNull @Length(max = 10) @Pattern(regexp = "Back-end|Front-end|Games") String category
+        // ignore status. Will not be shown to user
 ) {
 }

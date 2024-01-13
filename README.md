@@ -73,4 +73,4 @@ cannot use JPA/hibernate (be an Entity):
     If you want to be an Entity, must use jdbc and write querys
 ```
 
-stoped in https://youtu.be/xeOBISdqTQc?list=PLGxZ4Rq3BOBpwaVgAPxTxhdX_TfSVlTcY&t=884
+Must consider a Request DTO(without id) and Response DTO(with id)
