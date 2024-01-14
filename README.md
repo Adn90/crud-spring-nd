@@ -85,4 +85,15 @@ https://www.baeldung.com/java-performance-mapping-frameworks
 
 # Persisting ENUMS JPA
 
+````java
+public class ENUMJAP {
+    @NotNull
+    // borefe make converter
+    @Enumerated(EnumType.STRING) // save the enum in string format in the database 
+    @Convert(converter = CategoryConverter.class) // correct way to save in database
+    private Category category; 
+}
+
+````
+
 https://www.baeldung.com/jpa-persisting-enums-in-jpa
