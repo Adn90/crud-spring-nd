@@ -81,3 +81,8 @@ Must consider a Request DTO(without id) and Response DTO(with id)
 map entity -> dto, dto -> entity
 
 https://www.baeldung.com/java-performance-mapping-frameworks
+
+
+# Persisting ENUMS JPA
+
+https://www.baeldung.com/jpa-persisting-enums-in-jpa

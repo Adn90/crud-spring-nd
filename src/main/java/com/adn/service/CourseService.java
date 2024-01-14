@@ -2,6 +2,7 @@ package com.adn.service;
 
 import com.adn.dto.CourseDTO;
 import com.adn.dto.mapper.CourseMapper;
+import com.adn.enums.Category;
 import com.adn.exception.RecordNotFoundException;
 import com.adn.model.Course;
 import com.adn.repository.CourseRepository;
@@ -50,7 +51,7 @@ public class CourseService {
         return courseRepository.findById(id)
                 .map(dataFound -> {
                     dataFound.setName(course.name());
-                    dataFound.setCategory(course.category());
+                    dataFound.setCategory(Category.FRONT_END);
                     // dataFound has id, because of that, hibernate JPA will execute an update instead of create
                     return courseMapper.toDTO(courseRepository.save(dataFound));
                 }).orElseThrow(() -> new RecordNotFoundException(id));

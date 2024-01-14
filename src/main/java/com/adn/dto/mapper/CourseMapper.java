@@ -1,6 +1,7 @@
 package com.adn.dto.mapper;
 
 import com.adn.dto.CourseDTO;
+import com.adn.enums.Category;
 import com.adn.model.Course;
 import org.springframework.stereotype.Component;
 
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class CourseMapper {
     public CourseDTO toDTO(Course course) {
         if (course == null) return null;
-        return new CourseDTO(course.getId(), course.getName(), course.getCategory());
+        return new CourseDTO(course.getId(), course.getName(), "Front-end");
     }
 
     public Course toEntity(CourseDTO courseDTO) {
@@ -18,7 +19,7 @@ public class CourseMapper {
             course.setId(courseDTO.id());
         }
         course.setName(courseDTO.name());
-        course.setCategory(courseDTO.category());
+        course.setCategory(Category.FRONT_END);
         return course;
     }
 }

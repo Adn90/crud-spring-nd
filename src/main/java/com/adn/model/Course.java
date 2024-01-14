@@ -1,5 +1,6 @@
 package com.adn.model;
 
+import com.adn.enums.Category;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
@@ -34,10 +35,12 @@ public class Course {
     private  String name;
 
     @NotNull
-    @Pattern(regexp = "Back-end|Front-end|Games")
-    @Length(min = 1)
-    @Column(length = 10, nullable = false)
-    private  String category;
+//    @Pattern(regexp = "Back-end|Front-end|Games")
+//    @Length(min = 1)
+//    @Column(length = 10, nullable = false)
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING) // save the enum in string format in the database
+    private Category category;
 
     @NotNull
     @Pattern(regexp = "Active|Inactive")
