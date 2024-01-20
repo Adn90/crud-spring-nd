@@ -52,8 +52,10 @@ public class Course {
 
     @OneToMany(
             cascade = CascadeType.ALL, // when parent entity is modified, verifies if changes a needed in child entity
-            orphanRemoval = true
+            orphanRemoval = true,
+            mappedBy = "course" // more info in the README.md
     )
-    @JoinColumn(name = "course_id")
+    // @JoinColumn(name = "course_id")
+
     private List<Lesson> lessons = new ArrayList<>();
 }

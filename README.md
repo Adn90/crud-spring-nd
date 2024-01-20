@@ -102,3 +102,98 @@ https://www.baeldung.com/jpa-persisting-enums-in-jpa
 # ONE-to-Many
 
 https://vladmihalcea.com/the-best-way-to-map-a-onetomany-association-with-jpa-and-hibernate/
+
+
+### N+1 query problem with JPA and Hibernate
+https://vladmihalcea.com/n-plus-1-query-problem/
+https://stackoverflow.com/questions/97197/what-is-the-n1-selects-problem-in-orm-object-relational-mapping
+https://pt.stackoverflow.com/questions/307264/o-que-%C3%A9-o-problema-das-queries-n1
+
+````java
+public class Course {
+    @OneToMany(
+            cascade = CascadeType.ALL, // when parent entity is modified, verifies if changes a needed in child entity
+            orphanRemoval = true,
+            mappedBy = "course" // the owner of this relation is course. A way to make bidirectional relation to improve performance
+    )
+    // @JoinColumn(name = "course_id")
+
+    private List<Lesson> lessons = new ArrayList<>();
+}
+
+public class Lesson {
+    @ManyToOne(
+            fetch = FetchType.LAZY, // this mapping is loading only when .getCourse is called
+            optional = false // required field
+    )
+    private Course course;
+
+}
+
+
+````
+
+````
+LOG in CONSOLE when app is compiled
+
+Hibernate: select c1_0.id,c1_0.category,c1_0.name,c1_0.status from course c1_0 where (c1_0.status = 'Active')
+Hibernate: select next value for course_seq
+Hibernate: select next value for lesson_seq
+Hibernate: insert into course (category,name,status,id) values (?,?,?,?) *
+Hibernate: insert into lesson (course_id,name,youtube_url,id) values (?,?,?,?) **
+````
+
+````java
+public class CrudSpringApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(CrudSpringApplication.class, args);
+	}
+
+	@Bean // spring handle life cycle
+		// executed after app run
+	CommandLineRunner initLocalDatabase(CourseRepository courseRepository) {
+		return args -> {
+			courseRepository.deleteAll();
+			Course c = new Course();
+			c.setName("Angular");
+			c.setCategory(Category.FRONT_END);
+            
+            // * course is inserted, and thus its id
+
+			Lesson l = new Lesson();
+			l.setName("Intro");
+			l.setYoutubeUrl("Nb4uxLxdvxo");
+            
+            // ** course already have its id when is set in lesson          
+			l.setCourse(c);
+			c.getLessons().add(l);
+
+			courseRepository.save(c);
+		};
+	}
+}
+````
+
+## Performance
+
+````
+In this format, less database requests are made. When @Join
+@OneToMany(
+        cascade = CascadeType.ALL, // when parent entity is modified, verifies if changes a needed in child entity
+        orphanRemoval = true,
+        mappedBy = "course" // more info in the README.md
+)
+@JoinColumn(name = "course_id")
+
+in this course/lesson relation, the app would made 3 calls instead of two. 
+calling 1 course with 2 lessons, console:
+
+Hibernate: select c1_0.id,c1_0.category,c1_0.name,c1_0.status from course c1_0 where (c1_0.status = 'Active')
+Hibernate: select next value for course_seq
+Hibernate: select next value for lesson_seq
+Hibernate: select next value for lesson_seq
+Hibernate: insert into course (category,name,status,id) values (?,?,?,?)
+Hibernate: insert into lesson (course_id,name,youtube_url,id) values (?,?,?,?)
+Hibernate: insert into lesson (course_id,name,youtube_url,id) values (?,?,?,?)
+````

@@ -17,8 +17,8 @@ public class Lesson {
     @Column(length = 11, nullable = false)
     private String youtubeUrl;
 
-    // not needed, Course already has a @JoinColumn(name = "course_id").
-    // the effect would be the same
-    // private String course_id;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "course_id", nullable = false)
+    private Course course;
 
 }
