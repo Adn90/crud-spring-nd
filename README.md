@@ -97,3 +97,8 @@ public class ENUMJAP {
 ````
 
 https://www.baeldung.com/jpa-persisting-enums-in-jpa
+
+
+# ONE-to-Many
+
+https://vladmihalcea.com/the-best-way-to-map-a-onetomany-association-with-jpa-and-hibernate/

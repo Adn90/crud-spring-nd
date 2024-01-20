@@ -2,6 +2,7 @@ package com.adn;
 
 import com.adn.enums.Category;
 import com.adn.model.Course;
+import com.adn.model.Lesson;
 import com.adn.repository.CourseRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -23,6 +24,11 @@ public class CrudSpringApplication {
 			Course c = new Course();
 			c.setName("Angular");
 			c.setCategory(Category.FRONT_END);
+
+			Lesson l = new Lesson();
+			l.setName("Intro");
+			l.setYoutubeUrl("Nb4uxLxdvxo");
+			c.getLessons().add(l);
 
 			courseRepository.save(c);
 		};

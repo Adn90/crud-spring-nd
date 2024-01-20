@@ -15,6 +15,9 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.hibernate.validator.constraints.Length;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data // generate set, get, toString, equals, hash etc
 @Entity // jpa
 //@Table(name = "Courses") in case of legacy code, where database was created before
@@ -46,4 +49,11 @@ public class Course {
     @Column(length = 10, nullable = false)
     @Convert(converter = StatusConverter.class) // correct way to save in database
     private Status status = Status.ACTIVE;
+
+    @OneToMany(
+            cascade = CascadeType.ALL, // when parent entity is modified, verifies if changes a needed in child entity
+            orphanRemoval = true
+    )
+    @JoinColumn(name = "course_id")
+    private List<Lesson> lessons = new ArrayList<>();
 }
