@@ -1,7 +1,6 @@
 package com.adn.controller;
 
 import com.adn.dto.CourseDTO;
-import com.adn.model.Course;
 
 import com.adn.service.CourseService;
 import jakarta.validation.Valid;
@@ -12,7 +11,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @Validated // validates all java bean (jakarta) and hibernate. Except the model @Validate in create. That comes from Model class
 @RestController // java servelt (endpoint; url -- rest - get, post, etc)
@@ -30,8 +28,9 @@ public class CourseController {
         this.courseService = courseService;
     }
 
+    // @ResponseBody removed. @RestController set this annotation to all methods
     @GetMapping() // @RequestMapping(method = RequestMethod.GET) same as @GetMapping()
-    public @ResponseBody List<CourseDTO> list() {
+    public List<CourseDTO> list() {
         return courseService.list();
     }
 
