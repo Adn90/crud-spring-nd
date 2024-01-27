@@ -55,7 +55,5 @@ public class Course {
             orphanRemoval = true,
             mappedBy = "course" // more info in the README.md
     )
-    // @JoinColumn(name = "course_id")
-
     private List<Lesson> lessons = new ArrayList<>();
 }

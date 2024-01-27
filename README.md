@@ -159,7 +159,7 @@ public class CrudSpringApplication {
 			c.setName("Angular");
 			c.setCategory(Category.FRONT_END);
             
-            // * course is inserted, and thus its id
+            // * course is inserted, and thus its id (l.setCourse(c); reference)
 
 			Lesson l = new Lesson();
 			l.setName("Intro");
@@ -196,4 +196,54 @@ Hibernate: select next value for lesson_seq
 Hibernate: insert into course (category,name,status,id) values (?,?,?,?)
 Hibernate: insert into lesson (course_id,name,youtube_url,id) values (?,?,?,?)
 Hibernate: insert into lesson (course_id,name,youtube_url,id) values (?,?,?,?)
+````
+# List classes
+
+````java
+public record CourseDTO(
+        @JsonProperty("_id") Long id,
+        @NotBlank @NotNull @Length(min = 5, max = 10) String name,
+        @NotNull @Length(max = 10) @Pattern(regexp = "Back-end|Front-end|Games") String category,
+        // ignore status. Will not be shown to user
+        List<Lesson> lessons // easy way. Raw from database. working in database
+) {}
+````
+
+### circular Dependency
+
+- course will populate by first select, then lesson will be populated, via another select in database
+- lesson has a @ManyToOne(fetch = FetchType.LAZY, optional = false) to Course
+- and course has a private List<Lesson> lessons = new ArrayList<>();
+- the process repeats its self
+
+> the lesson @ManyToOne, solves the n + 1 problem.
+> to avoid circular dependency, just make att to set, and not get
+> @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) make the att to a set only mode, as name suggests
+
+````java
+public class Course {
+   // ...
+    @NotNull
+    @Column(length = 10, nullable = false)
+    @Convert(converter = StatusConverter.class) // correct way to save in database
+    private Status status = Status.ACTIVE;
+
+    @OneToMany(
+            cascade = CascadeType.ALL, // when parent entity is modified, verifies if changes a needed in child entity
+            orphanRemoval = true,
+            mappedBy = "course" // more info in the README.md
+    )
+    private List<Lesson> lessons = new ArrayList<>();
+}
+
+public class Lesson {
+    // ...
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "course_id", nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // avoid circular dependency
+    private Course course;
+
+}
+
 ````
