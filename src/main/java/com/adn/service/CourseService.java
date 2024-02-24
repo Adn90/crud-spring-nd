@@ -3,6 +3,7 @@ package com.adn.service;
 import com.adn.dto.CourseDTO;
 import com.adn.dto.mapper.CourseMapper;
 import com.adn.exception.RecordNotFoundException;
+import com.adn.model.Course;
 import com.adn.repository.CourseRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -47,8 +48,11 @@ public class CourseService {
     public CourseDTO update(@NotNull @Positive Long id, @Valid @NotNull CourseDTO courseDTO) {
         return courseRepository.findById(id)
                 .map(dataFound -> {
+                    Course course = courseMapper.toEntity(courseDTO);
                     dataFound.setName(courseDTO.name());
                     dataFound.setCategory(courseMapper.convertCategoryValue(courseDTO.category()));
+                    dataFound.getLessons().clear();
+                    course.getLessons().forEach(dataFound.getLessons()::add);
                     // dataFound has id, because of that, hibernate JPA will execute an update instead of create
                     return courseMapper.toDTO(courseRepository.save(dataFound));
                 }).orElseThrow(() -> new RecordNotFoundException(id));

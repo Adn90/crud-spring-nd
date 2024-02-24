@@ -247,3 +247,82 @@ public class Lesson {
 }
 
 ````
+
+
+# Lesson update
+
+> error about the disregard about collection came from database, and thus, make hibernate lost about new list
+
+```java
+class Course_and_mapper {
+    @OneToMany(
+        cascade = CascadeType.ALL, // when parent entity is modified, verifies if changes a needed in child entity
+        orphanRemoval = true,
+        mappedBy = "course" // more info in the README.md
+    )
+    private List<Lesson> lessons = new ArrayList<>(); // *1
+
+    // mapper class
+    public Course toEntity(CourseDTO courseDTO) {
+        //...
+        // create and update courses with lessons
+        List<Lesson> lessons = courseDTO.lessons().stream().map(lessonDTO -> {
+            var lesson = new Lesson();
+            lesson.setId(lessonDTO.id());
+            lesson.setName(lessonDTO.name());
+            lesson.setYoutubeUrl(lessonDTO.youtubeUrl());
+            lesson.setCourse(course);
+            return lesson; // *2
+        }).collect(Collectors.toList());
+        course.setLessons(lessons);
+
+        return course;
+    }
+}
+
+class updateLesson {
+    @SuppressWarnings("null")
+    public CourseDTO update(@NotNull @Positive Long id, @Valid @NotNull CourseDTO courseDTO) {
+        return courseRepository.findById(id)
+            .map(dataFound -> {
+                Course course = courseMapper.toEntity(courseDTO); // *3
+                dataFound.setName(courseDTO.name());
+                dataFound.setCategory(courseMapper.convertCategoryValue(courseDTO.category()));
+                dataFound.setLessons(course.getLessons()); // *3
+                // dataFound has id, because of that, hibernate JPA will execute an update instead of create
+                return courseMapper.toDTO(courseRepository.save(dataFound));
+            }).orElseThrow(() -> new RecordNotFoundException(id));
+    }
+}
+
+```
+
+> org.hibernate.HibernateException: A collection with cascade="all-delete-orphan" was no longer referenced by the owning entity instance
+
+- JPA 'n hibernate will get the lesson list in the mapper class (dataFound), declared in course class
+- then in the update service, the user one more time set a new lesson list
+- in this case, hibernate will be lost it about the new lesson list, and thus throw the exception
+
+
+```java
+
+class updateLesson {
+    @SuppressWarnings("null")
+    public CourseDTO update(@NotNull @Positive Long id, @Valid @NotNull CourseDTO courseDTO) {
+        return courseRepository.findById(id)
+            .map(dataFound -> {
+                Course course = courseMapper.toEntity(courseDTO);
+                dataFound.setName(courseDTO.name());
+                dataFound.setCategory(courseMapper.convertCategoryValue(courseDTO.category()));
+                dataFound.getLessons().clear();
+                course.getLessons().forEach(dataFound.getLessons()::add);
+                return courseMapper.toDTO(courseRepository.save(dataFound));
+            }).orElseThrow(() -> new RecordNotFoundException(id));
+    }
+}
+
+```
+
+-  dataFound.getLessons().clear(); will delete all lesson data from database
+-   and will just add the updated versions of lesson
+- this way the hibenate reference will be the same
