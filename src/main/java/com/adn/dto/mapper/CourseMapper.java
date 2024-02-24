@@ -4,6 +4,8 @@ import com.adn.dto.CourseDTO;
 import com.adn.dto.LessonDTO;
 import com.adn.enums.Category;
 import com.adn.model.Course;
+import com.adn.model.Lesson;
+
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -32,8 +34,19 @@ public class CourseMapper {
             course.setId(courseDTO.id());
         }
         course.setName(courseDTO.name());
-        // TODO: use a Mapper for category
         course.setCategory(convertCategoryValue(courseDTO.category()));
+
+        // create and update courses with lessons
+        List<Lesson> lessons = courseDTO.lessons().stream().map(lessonDTO -> {
+            var lesson = new Lesson();
+            lesson.setId(lessonDTO.id());
+            lesson.setName(lessonDTO.name());
+            lesson.setYoutubeUrl(lessonDTO.youtubeUrl());
+            lesson.setCourse(course);
+            return lesson;
+        }).collect(Collectors.toList());
+        course.setLessons(lessons);
+
         return course;
     }
 

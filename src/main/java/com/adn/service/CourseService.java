@@ -32,25 +32,29 @@ public class CourseService {
     }
 
     // @PathVariable removed; should be in controller
+    @SuppressWarnings("null")
     public CourseDTO findById(@NotNull @Positive Long id) {
         return courseRepository.findById(id).map(courseMapper::toDTO)
                 .orElseThrow(() -> new RecordNotFoundException(id));
     }
 
+    @SuppressWarnings("null")
     public CourseDTO create(@Valid @NotNull CourseDTO course) {
         return courseMapper.toDTO(courseRepository.save(courseMapper.toEntity(course)));
     }
 
-    public CourseDTO update(@NotNull @Positive Long id, @Valid @NotNull CourseDTO course) {
+    @SuppressWarnings("null")
+    public CourseDTO update(@NotNull @Positive Long id, @Valid @NotNull CourseDTO courseDTO) {
         return courseRepository.findById(id)
                 .map(dataFound -> {
-                    dataFound.setName(course.name());
-                    dataFound.setCategory(courseMapper.convertCategoryValue(course.category()));
+                    dataFound.setName(courseDTO.name());
+                    dataFound.setCategory(courseMapper.convertCategoryValue(courseDTO.category()));
                     // dataFound has id, because of that, hibernate JPA will execute an update instead of create
                     return courseMapper.toDTO(courseRepository.save(dataFound));
                 }).orElseThrow(() -> new RecordNotFoundException(id));
     }
 
+    @SuppressWarnings("null")
     public void delete(@NotNull @Positive Long id) {
         courseRepository.delete(courseRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException(id)));
