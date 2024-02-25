@@ -7,7 +7,9 @@ import com.adn.enums.converters.StatusConverter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 import lombok.Data;
@@ -50,6 +52,9 @@ public class Course {
     @Convert(converter = StatusConverter.class) // correct way to save in database
     private Status status = Status.ACTIVE;
 
+    @NotNull
+    @NotEmpty
+    @Valid
     @OneToMany(
             cascade = CascadeType.ALL, // when parent entity is modified, verifies if changes a needed in child entity
             orphanRemoval = true,

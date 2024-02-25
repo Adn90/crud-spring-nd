@@ -28,6 +28,7 @@ public class Lesson {
     @Column(length = 11, nullable = false)
     private String youtubeUrl;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "course_id", nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // avoid circular dependency
