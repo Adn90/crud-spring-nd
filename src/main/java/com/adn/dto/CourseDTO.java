@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import org.hibernate.validator.constraints.Length;
@@ -15,5 +16,5 @@ public record CourseDTO(
         @NotNull @NotBlank @Length(min = 5, max = 100) String name,
         @NotNull @Length(max = 10) @Pattern(regexp = "Back-end|Front-end|Games") String category,
         // ignore status. Will not be shown to user
-        @NotNull @NotBlank @Valid List<LessonDTO> lessons
+        @NotNull @NotEmpty @Valid List<LessonDTO> lessons
 ) {}
