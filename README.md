@@ -326,3 +326,84 @@ class updateLesson {
 -  dataFound.getLessons().clear(); will delete all lesson data from database
 -   and will just add the updated versions of lesson
 - this way the hibenate reference will be the same
+
+
+
+# Validadte Enuns
+
+- https://www.baeldung.com/javax-validations-enums
+- Validating That a String Matches a Value of an Enum
+- Generic for for enum validation
+
+```java
+class EnumValidationsAsString {
+    @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
+    @Retention(RUNTIME)
+    @Documented
+    @Constraint(validatedBy = ValueOfEnumValidator.class)
+    public @interface ValueOfEnum {
+        Class<? extends Enum<?>> enumClass();
+        String message() default "must be any of enum {enumClass}";
+        Class<?>[] groups() default {};
+        Class<? extends Payload>[] payload() default {};
+    }
+}
+
+public class ValueOfEnumValidator implements ConstraintValidator<ValueOfEnum, CharSequence> {
+    private List<String> acceptedValues;
+
+    @Override
+    public void initialize(ValueOfEnum annotation) {
+        acceptedValues = Stream.of(annotation.enumClass().getEnumConstants())
+                .map(Enum::name)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
+        if (value == null) {
+            return true;
+        }
+
+        return acceptedValues.contains(value.toString());
+    }
+}
+
+@ValueOfEnum(enumClass = CustomerType.class)
+private String customerTypeString;
+```
+
+### Subset of enums exemple
+
+```java
+class subSetEnum() {
+    @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
+    @Retention(RUNTIME)
+    @Documented
+    @Constraint(validatedBy = CustomerTypeSubSetValidator.class)
+    public @interface CustomerTypeSubset {
+        CustomerType[] anyOf();
+        String message() default "must be any of {anyOf}";
+        Class<?>[] groups() default {};
+        Class<? extends Payload>[] payload() default {};
+    }
+}
+
+public class CustomerTypeSubSetValidator implements ConstraintValidator<CustomerTypeSubset, CustomerType> {
+    private CustomerType[] subset;
+
+    @Override
+    public void initialize(CustomerTypeSubset constraint) {
+        this.subset = constraint.anyOf();
+    }
+
+    @Override
+    public boolean isValid(CustomerType value, ConstraintValidatorContext context) {
+        return value == null || Arrays.asList(subset).contains(value);
+    }
+}
+
+
+@CustomerTypeSubset(anyOf = {CustomerType.NEW, CustomerType.OLD})
+private CustomerType customerType;
+```
