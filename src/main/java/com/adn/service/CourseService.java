@@ -1,13 +1,19 @@
 package com.adn.service;
 
 import com.adn.dto.CourseDTO;
+import com.adn.dto.CoursePageDTO;
 import com.adn.dto.mapper.CourseMapper;
 import com.adn.exception.RecordNotFoundException;
 import com.adn.model.Course;
 import com.adn.repository.CourseRepository;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -25,11 +31,19 @@ public class CourseService {
         this.courseMapper = courseMapper;
     }
 
-    public List<CourseDTO> list() {
-        return courseRepository.findAll()
-                .stream()
-                .map(courseMapper::toDTO) //.map(course -> courseMapper.toDTO(course))
-                .collect(Collectors.toList()); // .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+    // public List<CourseDTO> list() {
+    //     return courseRepository.findAll()
+    //             .stream()
+    //             .map(courseMapper::toDTO) //.map(course -> courseMapper.toDTO(course))
+    //             .collect(Collectors.toList()); // .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+    // }
+
+    public CoursePageDTO list(@PositiveOrZero int pageNumber, @Positive @Max(100) int pageSize) {
+        Page<Course> pageCourse = courseRepository.findAll(PageRequest.of(pageNumber, pageSize));
+        List<CourseDTO> courses = pageCourse.get()
+            .map(courseMapper::toDTO) //.map(course -> courseMapper.toDTO(course))
+            .collect(Collectors.toList()); // .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+        return new CoursePageDTO(courses, pageCourse.getTotalElements(), pageCourse.getTotalPages());
     }
 
     // @PathVariable removed; should be in controller

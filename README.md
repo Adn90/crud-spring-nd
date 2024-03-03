@@ -407,3 +407,8 @@ public class CustomerTypeSubSetValidator implements ConstraintValidator<Customer
 @CustomerTypeSubset(anyOf = {CustomerType.NEW, CustomerType.OLD})
 private CustomerType customerType;
 ```
+
+
+# Pagination
+
+- JPA and Hibernate will abstract the pagination querys.

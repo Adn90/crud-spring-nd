@@ -19,25 +19,28 @@ public class CrudSpringApplication {
 	@Bean // spring handle life cycle
 		// executed after app run
 	CommandLineRunner initLocalDatabase(CourseRepository courseRepository) {
+		
 		return args -> {
 			courseRepository.deleteAll();
-			Course c = new Course();
-			c.setName("Angular");
-			c.setCategory(Category.FRONT_END);
+			for (int i = 0; i < 20; i++) {				
+				Course c = new Course();
+				c.setName(String.format("Curso: %s", i + 1));
+				c.setCategory(Category.BACK_END);
 
-			Lesson l = new Lesson();
-			l.setName("Intro");
-			l.setYoutubeUrl("Nb4uxLxdvxo");
-			l.setCourse(c);
-			c.getLessons().add(l);
+				Lesson l = new Lesson();
+				l.setName("Intro");
+				l.setYoutubeUrl("Nb4uxLxdvxo");
+				l.setCourse(c);
+				c.getLessons().add(l);
 
-			Lesson l2 = new Lesson();
-			l2.setName("Aula 2");
-			l2.setYoutubeUrl("Nb4uxLxdvx1");
-			l2.setCourse(c);
-			c.getLessons().add(l2);
+				Lesson l2 = new Lesson();
+				l2.setName("Aula 2");
+				l2.setYoutubeUrl("Nb4uxLxdvx1");
+				l2.setCourse(c);
+				c.getLessons().add(l2);
 
-			courseRepository.save(c);
+				courseRepository.save(c);
+			}
 		};
 	}
 }

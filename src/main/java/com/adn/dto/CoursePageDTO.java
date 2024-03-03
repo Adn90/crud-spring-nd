@@ -1,0 +1,9 @@
+package com.adn.dto;
+
+import java.util.List;
+
+public record CoursePageDTO(
+    List<CourseDTO> courses,
+    long totalELements,
+    int totalPages
+) {}
