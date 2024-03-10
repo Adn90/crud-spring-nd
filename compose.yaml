@@ -1,0 +1,15 @@
+# services:
+#   mysql:
+#     image: 'mysql:latest'
+#     environment:
+#       - 'MYSQL_DATABASE=mydatabase'
+#       - 'MYSQL_PASSWORD=secret'
+#       - 'MYSQL_ROOT_PASSWORD=verysecret'
+#       - 'MYSQL_USER=myuser'
+#     ports:
+#       - '3306'
+
+
+# DOCKER CONFIG
+# Vá em https://start.spring.io/ e escolhar:
+# Docker Compose Support e o banco de sua escolha. Lá vai ser gerado o arquivo de config

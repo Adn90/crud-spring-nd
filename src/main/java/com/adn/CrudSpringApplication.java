@@ -8,6 +8,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 
 @SpringBootApplication
 public class CrudSpringApplication {
@@ -18,6 +19,7 @@ public class CrudSpringApplication {
 
 	@Bean // spring handle life cycle
 		// executed after app run
+	@Profile("dev") // application-dev.properties
 	CommandLineRunner initLocalDatabase(CourseRepository courseRepository) {
 		
 		return args -> {
